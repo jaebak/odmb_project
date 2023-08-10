@@ -313,14 +313,14 @@ begin
   -------------------------------------------------------------------------------------------
   -- 2^25 = 33'554'432, 2^26 = 67'108'864, 2^27 = 134'217'728, 2^28 = 268'435'456, 2^30 = 1'073'741'824
 
-  led_clkfreqs(0) <= std_logic(cntr_cmsclk(26));    -- clk at  40 MHz = led at 134/40 ~  3.4 sec
-  led_clkfreqs(1) <= std_logic(cntr_mgtclk1(26));   -- clk at 160 MHz = led at 134/160 ~ 0.8 sec 
-  led_clkfreqs(2) <= std_logic(cntr_mgtclk2(26));   -- clk at 160 MHz = led at 134/160 ~ 0.8 sec 
-  led_clkfreqs(3) <= std_logic(cntr_mgtclk3(26));   -- clk at 160 MHz = led at 134/160 ~ 0.8 sec 
-  led_clkfreqs(4) <= std_logic(cntr_mgtclk4(26));   -- clk at 120 MHz = led at 134/120 ~ 1.1 sec
-  led_clkfreqs(5) <= std_logic(cntr_mgtclk5(26));   -- clk at 160 MHz = led at 134/160 ~ 0.8 sec 
-  led_clkfreqs(6) <= std_logic(cntr_mgtclk125(26)); -- clk at 125 MHz = led at 134/125 ~ 1.1 sec
-  led_clkfreqs(7) <= std_logic(cntr_clkgp7(26));    -- clk at  80 MHz = led at 134/80 ~  1.7 sec
+  led_clkfreqs(0) <= std_logic(cntr_cmsclk(26));    -- clk at  40 MHz = led at 67/40 ~  1.7 sec
+  led_clkfreqs(1) <= std_logic(cntr_mgtclk1(26));   -- clk at 160 MHz = led at 67/160 ~ 0.4 sec 
+  led_clkfreqs(2) <= std_logic(cntr_mgtclk2(26));   -- clk at 160 MHz = led at 67/160 ~ 0.4 sec 
+  led_clkfreqs(3) <= std_logic(cntr_mgtclk3(26));   -- clk at 160 MHz = led at 67/160 ~ 0.4 sec 
+  led_clkfreqs(4) <= std_logic(cntr_mgtclk4(26));   -- clk at 120 MHz = led at 67/120 ~ 0.6 sec
+  led_clkfreqs(5) <= std_logic(cntr_mgtclk5(26));   -- clk at 160 MHz = led at 67/160 ~ 0.4 sec 
+  led_clkfreqs(6) <= std_logic(cntr_mgtclk125(26)); -- clk at 125 MHz = led at 67/125 ~ 0.5 sec
+  led_clkfreqs(7) <= std_logic(cntr_clkgp7(26));    -- clk at  80 MHz = led at 67/80 ~  0.8 sec
 
    cntr_cmsclk    <= cntr_cmsclk    + 1 when rising_edge(clk_cmsclk_unbuf);
    cntr_mgtclk1   <= cntr_mgtclk1   + 1 when rising_edge(mgtclk1);
