@@ -148,20 +148,19 @@ entity odmb7_ucsb_dev is
     --------------------------------
     -- ODMB optical ports
     --------------------------------
-    -- Acutally connected optical TX/RX signals
-    DAQ_RX_P     : in std_logic_vector(10 downto 0);       --! R12 optical RX from FE boards.
-    DAQ_RX_N     : in std_logic_vector(10 downto 0);       --! R12 optical RX from FE boards.
-    DAQ_SPY_RX_P : in std_logic;                           --! R12 optical RX from FE boards (DAQ_RX_P11) or finisar RX SPY_RX_P.
-    DAQ_SPY_RX_N : in std_logic;                           --! R12 optical RX from FE boards (DAQ_RX_N11) or finisar RX SPY_RX_N.
-    B04_RX_P     : in std_logic_vector(4 downto 2);        --! B04 optical RX from FED. No use yet.
-    B04_RX_N     : in std_logic_vector(4 downto 2);        --! B04 optical RX from FED. No use yet.
-    BCK_PRS_P    : in std_logic;                           --! B04 optical RX from FED for backpressure (B04_RX1_P).
-    BCK_PRS_N    : in std_logic;                           --! B04 optical RX from FED for backpressure (B04_RX1_N).
-
-    SPY_TX_P     : out std_logic;                          --! Finisar (spy) optical TX output to PC.
-    SPY_TX_N     : out std_logic;                          --! Finisar (spy) optical TX output to PC.
-    DAQ_TX_P     : out std_logic_vector(2 downto 2);       --! B04 optical TX, output to FED.
-    DAQ_TX_N     : out std_logic_vector(2 downto 2);       --! B04 optical TX, output to FED.
+    -- Below are not needed because, they are defined by the location of the optics ipcore.
+    --DAQ_RX_P     : in std_logic_vector(10 downto 0);       --! R12 optical RX from FE boards.
+    --DAQ_RX_N     : in std_logic_vector(10 downto 0);       --! R12 optical RX from FE boards.
+    --DAQ_SPY_RX_P : in std_logic;                           --! R12 optical RX from FE boards (DAQ_RX_P11) or finisar RX SPY_RX_P.
+    --DAQ_SPY_RX_N : in std_logic;                           --! R12 optical RX from FE boards (DAQ_RX_N11) or finisar RX SPY_RX_N.
+    --B04_RX_P     : in std_logic_vector(4 downto 2);        --! B04 optical RX from FED. No use yet.
+    --B04_RX_N     : in std_logic_vector(4 downto 2);        --! B04 optical RX from FED. No use yet.
+    --BCK_PRS_P    : in std_logic;                           --! B04 optical RX from FED for backpressure (B04_RX1_P).
+    --BCK_PRS_N    : in std_logic;                           --! B04 optical RX from FED for backpressure (B04_RX1_N).
+    --SPY_TX_P     : out std_logic;                          --! Finisar (spy) optical TX output to PC.
+    --SPY_TX_N     : out std_logic;                          --! Finisar (spy) optical TX output to PC.
+    --DAQ_TX_P     : out std_logic_vector(2 downto 2);       --! B04 optical TX, output to FED.
+    --DAQ_TX_N     : out std_logic_vector(2 downto 2);       --! B04 optical TX, output to FED.
 
     --------------------------------
     -- Optical control signals
@@ -277,6 +276,19 @@ architecture Behavioral of odmb7_ucsb_dev is
   signal mgtclk125 : std_logic;
   signal led_clkfreqs : std_logic_vector(7 downto 0);
 
+  --------------------------------------
+  -- Signals for DCFEB I/O buffers to prevent implementation errors
+  --------------------------------------
+  signal dcfeb_tck    : std_logic_vector (7 downto 1) := (others => '0');
+  signal dcfeb_l1a_match    : std_logic_vector(7 downto 1) := (others => '0');
+  signal dcfeb_tms    : std_logic := '0';
+  signal dcfeb_tdi    : std_logic := '0';
+  signal dcfeb_injpls       : std_logic := '0';
+  signal dcfeb_extpls       : std_logic := '0';
+  signal dcfeb_resync       : std_logic := '0';
+  signal dcfeb_bc0          : std_logic := '0';
+  signal dcfeb_l1a          : std_logic := '0';
+
 begin
 
   -------------------------------------------------------------------------------------------
@@ -330,7 +342,9 @@ begin
       led_clkfreqs   => led_clkfreqs
       );
 
+  -------------------------------------------------------------------------------------------
   -- Make LED lights blink to reflect clock frequencies
+  -------------------------------------------------------------------------------------------
   LEDS_CFV(0)  <= led_clkfreqs(0);  -- cmsclk   :  40 MHz = led at 134/40  ~ 3.4 Hz
   LEDS_CFV(2)  <= led_clkfreqs(1);  -- mgtclk1  : 160 MHz = led at 134/160 ~ 0.8 Hz
   LEDS_CFV(4)  <= led_clkfreqs(3);  -- mgtclk3  : 160 MHz = led at 134/160 ~ 0.8 Hz
@@ -358,5 +372,21 @@ begin
   --TX12_CS_B <= '1';
   --B04_I2C_ENA <= '0';
   --B04_CS_B <= '1';
+
+  -------------------------------------------------------------------------------------------
+  -- DCFEB I/O buffers to prevent implementation errors
+  -------------------------------------------------------------------------------------------
+  OB_DCFEB_TMS: OBUFDS port map (I => dcfeb_tms, O => DCFEB_TMS_P, OB => DCFEB_TMS_N);
+  OB_DCFEB_TDI: OBUFDS port map (I => dcfeb_tdi, O => DCFEB_TDI_P, OB => DCFEB_TDI_N);
+  OB_DCFEB_INJPLS: OBUFDS port map (I => dcfeb_injpls, O => INJPLS_P, OB => INJPLS_N);
+  OB_DCFEB_EXTPLS: OBUFDS port map (I => dcfeb_extpls, O => EXTPLS_P, OB => EXTPLS_N);
+  OB_DCFEB_RESYNC: OBUFDS port map (I => dcfeb_resync, O => RESYNC_P, OB => RESYNC_N);
+  OB_DCFEB_BC0: OBUFDS port map (I => dcfeb_bc0, O => BC0_P, OB => BC0_N);
+  OB_DCFEB_L1A: OBUFDS port map (I => dcfeb_l1a, O => L1A_P, OB => L1A_N);
+  GEN_DCFEBJTAG_7 : for I in 1 to 7 generate
+  begin
+    OB_DCFEB_TCK: OBUFDS port map (I => dcfeb_tck(I), O => DCFEB_TCK_P(I), OB => DCFEB_TCK_N(I));
+    OB_DCFEB_L1A_MATCH: OBUFDS port map (I => dcfeb_l1a_match(I), O => L1A_MATCH_P(I), OB => L1A_MATCH_N(I));
+  end generate GEN_DCFEBJTAG_7;
 
 end Behavioral;
